@@ -42,10 +42,11 @@ export class ProductsService {
   async getUsersProducts(
     paginationDto: PaginationDto,
   ): Promise<ProductsResponse> {
-    const userId: any = this.request.user.id;
+    // const userId: any = this.request.user.id;
+    const user: any = this.request.user;
 
     const [rows, count] = await this.productRepository.findAndCount({
-      where: { userId: userId },
+      where: { userId: user.id },
       skip: (paginationDto.page - 1) * (paginationDto.count + 1),
       take: paginationDto.count,
       order: { createdAt: paginationDto.order },
