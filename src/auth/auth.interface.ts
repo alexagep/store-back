@@ -8,3 +8,7 @@ export interface TokenClaim {
   lastName: string;
   email: string;
 }
+
+export interface VerifyValidationCodeResponse {
+  message: string;
+}
