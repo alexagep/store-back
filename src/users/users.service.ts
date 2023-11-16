@@ -23,4 +23,8 @@ export class UsersService {
     // return the user or null if not found
     return user || null;
   }
+
+  async updateVerifiedEmail(email: string): Promise<void> {
+    await this.userRepository.update({ email }, { emailVerified: true });
+  }
 }

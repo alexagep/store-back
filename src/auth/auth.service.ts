@@ -76,8 +76,6 @@ export class AuthService {
     // Generate a new OTP token
     const otpToken = this.generateOtpToken();
 
-    // Save the OTP token in Redis with a 5-minute expiration time
-    // const redisClient = await this.redisService.getClient();
     await this.redisClient.set(
       email,
       JSON.stringify({
@@ -107,16 +105,15 @@ export class AuthService {
     const { code } = verifyValidationCodeRequest;
     const email: string = this.request.user.email;
 
-    const redisClient = await this.redisService.getClient();
-    const storedOtpToken = await redisClient.get(email);
+    const storedOtpToken = await this.redisClient.get(email);
 
     // Compare the OTP tokens
     if (storedOtpToken === code) {
       // Update the emailVerified field in the database to true
-      await this.userRepository.update({ email }, { emailVerified: true });
+      await this.userService.updateVerifiedEmail(email);
 
       // Delete the OTP token from Redis
-      await redisClient.del(email);
+      await this.redisClient.del(email);
 
       // Return true to indicate success
       return {
@@ -125,7 +122,7 @@ export class AuthService {
     } else {
       // Return false to indicate failure
       return {
-        message: 'error in validating email',
+        message: 'code is not correct',
       };
     }
   }
