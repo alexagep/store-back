@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
   CreateProductDto,
@@ -8,30 +8,33 @@ import {
 } from './DTO/product.dto';
 import { Products } from './products.entity';
 import { AuthGuard } from 'src/auth/guard/auth.gaurd';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { Users } from 'src/users/users.entity';
+import { GetUser } from './helper/get-user.decorator';
 
 @Controller('products')
-@UseGuards(AuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  // @UseGuards(AuthGuard)
-  async create(@Body() body: CreateProductDto): Promise<Products> {
-    const result = await this.productsService.create(body);
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() body: CreateProductDto, @GetUser() user: Users): Promise<Products> {
+    const result = await this.productsService.create(body, user.id);
     return result;
   }
 
   @Get('getAll')
-  // @UseGuards(AuthGuard)
-  async list(@Body() paginationDto: PaginationDto): Promise<ProductsResponse> {
+  @UseGuards(JwtAuthGuard)
+  async list(@Query() paginationDto: PaginationDto): Promise<ProductsResponse> {
     const result = await this.productsService.getAllProducts(paginationDto);
     return result;
   }
 
   @Get('my-products')
-  // @UseGuards(AuthGuard)
-  async get(@Body() paginationDto: PaginationDto): Promise<ProductsResponse> {
-    const result = await this.productsService.getUsersProducts(paginationDto);
+  @UseGuards(JwtAuthGuard)
+  async get(@Query() paginationDto: PaginationDto, @GetUser() user: Users): Promise<ProductsResponse> {
+    const result = await this.productsService.getUsersProducts(paginationDto, user.id);
     return result;
   }
 }

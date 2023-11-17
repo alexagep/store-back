@@ -7,12 +7,12 @@ import {
 } from 'typeorm';
 import { Users } from '../users/users.entity';
 
-@Entity('Products') // این دکوراتور نام جدول را مشخص می کند
+@Entity('Products')
 export class Products {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'string', nullable: false })
+  @Column({ type: 'varchar', nullable: false }) // change type to varchar
   title: string;
 
   @Column({ type: 'text', nullable: false })
@@ -31,6 +31,6 @@ export class Products {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'UserId' })
+  @JoinColumn({ name: 'userId' })
   user: Users;
 }

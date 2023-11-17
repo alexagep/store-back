@@ -26,7 +26,7 @@ export class VerifyValidationCodeDto {
 }
 
 export class SignupDto {
-  @Validate(UserExistsRule)
+  // @Validate(UserExistsRule)
   @IsNotEmpty()
   @IsEmail()
   email: string;

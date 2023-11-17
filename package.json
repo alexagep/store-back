@@ -10,7 +10,7 @@
     "typeorm": "ts-node ./node_modules/.bin/typeorm",
     "migration:create": "typeorm migration:create",
     "migration:run": "npm run typeorm -- -d ./src/config/typeorm.ts migration:run",
-    "migration:revert": "npm run typeorm migration:revert",
+    "migration:revert": "npm run typeorm -- -d ./src/config/typeorm.ts migration:revert",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

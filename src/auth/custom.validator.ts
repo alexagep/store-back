@@ -1,4 +1,4 @@
-import { registerDecorator, ValidationOptions } from 'class-validator';
+import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
 
 export function IsPassword(validationOptions?: ValidationOptions) {
   return function (object: NonNullable<unknown>, propertyName: string) {
@@ -6,7 +6,10 @@ export function IsPassword(validationOptions?: ValidationOptions) {
       name: 'isPassword',
       target: object.constructor,
       propertyName: propertyName,
-      options: validationOptions,
+      options: {
+        ...validationOptions,
+        message: (args: ValidationArguments) => `Password ${args.value} is invalid. It must contain at least one digit, one lowercase letter.`
+      },
       validator: {
         validate(value: any) {
           const passRegEx =

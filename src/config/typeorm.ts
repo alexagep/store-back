@@ -12,5 +12,5 @@ export default new DataSource({
   username: configService.get('DB_USERNAME'),
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
-  migrations: [join(__dirname + '/../../db/migrate/*.ts')],
+  migrations: [join(__dirname + '/../../db/migrations/*.ts')],
 });

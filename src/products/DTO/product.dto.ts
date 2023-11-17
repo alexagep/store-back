@@ -23,6 +23,10 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }
 
 export class UpdateProductDto {

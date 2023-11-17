@@ -6,16 +6,16 @@ export class Users {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'string', nullable: false })
+  @Column({ nullable: false })
   name: string;
 
-  @Column({ type: 'string', nullable: false })
+  @Column({ nullable: false })
   lastName: string;
 
-  @Column({ type: 'string', unique: true, nullable: false })
+  @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ type: 'string', nullable: false })
+  @Column({ nullable: false })
   password: string;
 
   @Column({ type: 'boolean', default: false })

@@ -5,7 +5,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async send(email: string, otpToken: string) {
+  async sendMail(email: string, otpToken: string) {
     //TODO: check when get email from part best engineers
     await this.mailerService.sendMail({
       to: email,

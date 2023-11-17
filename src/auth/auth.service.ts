@@ -1,6 +1,8 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { UtilsService } from '../common/providers/utils/utils.service';
+import { EmailService } from 'src/email/email.service';
+
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto, VerifyValidationCodeDto } from './DTO/auth.dto';
@@ -21,18 +23,20 @@ export class AuthService {
     private readonly userService: UsersService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
     @Inject(REQUEST)
     private readonly request: Request,
     @Inject(REDIS_CLIENT) private readonly redisClient: RedisClient,
   ) {
     this.redisAuthExpire = this.configService.get<number>(
-      'REDIS_JWT_EXPIRE_TIME',
+      'REDIS_EXPIRE_TIME',
     );
   }
 
   async login(loginDto: LoginDto): Promise<AccessTokenDto> {
     const user = await this.userService.findUserByEmail(loginDto.email);
 
+    console.log(user)
     const isCorrect = await UtilsService.comparePass(
       loginDto.password,
       user.password,
@@ -54,11 +58,13 @@ export class AuthService {
     };
   }
 
-  private async generateToken(tokenClaim: TokenClaim): Promise<string> {
-    const token = await this.jwtService.signAsync(tokenClaim, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_EXPIRE_TIME'),
-    });
+  private generateToken(tokenClaim: TokenClaim): string {
+    // const token = await this.jwtService.signAsync(tokenClaim, {
+    //   secret: this.configService.get<string>('JWT_SECRET'),
+    //   expiresIn: this.configService.get<string>('JWT_EXPIRE_TIME'),
+    // });
+
+    const token = this.jwtService.sign(tokenClaim);
 
     return token;
   }
@@ -87,11 +93,10 @@ export class AuthService {
     );
 
     // Send the email to the user with the OTP token
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Email verification',
-      text: `Your OTP token is ${otpToken}. It will expire in 5 minutes.`,
-    });
+    await this.emailService.sendMail(
+      email,
+      otpToken,
+    );
   }
 
   private generateOtpToken(): string {
