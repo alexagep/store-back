@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from './users.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { CreateUserDto } from './DTO/user.dto';
 import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { REDIS_CLIENT, RedisClient } from 'src/common/redis/redis.types';
+import { VerifyValidationCodeResponse } from 'src/auth/auth.interface';
 
 @Injectable()
 export class UsersService {
@@ -26,11 +27,27 @@ export class UsersService {
   async create(userInfo: CreateUserDto): Promise<Users> {
     const createdUser = await this.userRepository.create(userInfo);
 
-    await this.userRepository.save(createdUser);
+    const user = await this.userRepository.save(createdUser);
 
-    // await this.sendOtpEmail(userInfo.email)
+    this.sendOtpEmail(user.email)
 
-    return createdUser;
+    delete user.password
+
+    return user;
+  }
+
+  async resendCode(user: Users): Promise<VerifyValidationCodeResponse> {
+    console.log(user)
+
+    if(user.emailVerified) {
+      throw new BadRequestException('you already are verified');
+    }
+
+    this.sendOtpEmail(user.email)
+
+    return {
+      message: 'otpCode is sent, check it out'
+    };
   }
 
   async findUserByEmail(email: string): Promise<Users | null> {
@@ -61,7 +78,7 @@ export class UsersService {
     );
 
     // Send the email to the user with the OTP token
-    await this.emailService.sendMail(
+    await this.emailService.saveMockFile(
       email,
       otpToken,
     );

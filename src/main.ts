@@ -13,7 +13,6 @@ async function bootstrap() {
   app.useGlobalFilters(new QueryFailedFilter());
 
   
-  
   // app.useGlobalFilters(new ErrorFilter());
   app.useGlobalPipes(
     new ValidationPipe({

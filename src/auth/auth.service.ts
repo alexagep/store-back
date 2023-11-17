@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { UtilsService } from '../common/providers/utils/utils.service';
 import { EmailService } from 'src/email/email.service';
@@ -15,8 +15,9 @@ import {
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { REDIS_CLIENT, RedisClient } from 'src/common/redis/redis.types';
+import { GetUser } from 'src/helper/get-user.decorator';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuthService {
   private readonly redisAuthExpire: number;
   constructor(
@@ -75,6 +76,7 @@ export class AuthService {
       name: userData.name,
       lastName: userData.lastName,
       email: userData.email,
+      emailVerified: userData.emailVerified
     };
   }
 
@@ -100,20 +102,21 @@ export class AuthService {
   }
 
   private generateOtpToken(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return Math.floor(100000 + Math.random() * 999999).toString();
   }
 
   async validateEmail(
     verifyValidationCodeRequest: VerifyValidationCodeDto,
+    @GetUser() user: Users,
   ): Promise<VerifyValidationCodeResponse> {
     // Get the OTP token from Redis
     const { code } = verifyValidationCodeRequest;
-    const email: string = this.request.user.email;
+    const email: string = user.email;
 
     const storedOtpToken = await this.redisClient.get(email);
 
     // Compare the OTP tokens
-    if (storedOtpToken === code) {
+    if (storedOtpToken != null && JSON.parse(storedOtpToken).code === code) {
       // Update the emailVerified field in the database to true
       await this.userService.updateVerifiedEmail(email);
 

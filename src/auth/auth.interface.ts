@@ -7,6 +7,7 @@ export interface TokenClaim {
   name: string;
   lastName: string;
   email: string;
+  emailVerified: boolean;
 }
 
 export interface VerifyValidationCodeResponse {
