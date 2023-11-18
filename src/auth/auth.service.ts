@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { UtilsService } from '../common/providers/utils/utils.service';
 import { EmailService } from 'src/email/email.service';
@@ -17,7 +17,7 @@ import { Request } from 'express';
 import { REDIS_CLIENT, RedisClient } from 'src/common/redis/redis.types';
 import { GetUser } from 'src/helper/get-user.decorator';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class AuthService {
   private readonly redisAuthExpire: number;
   constructor(
@@ -29,15 +29,12 @@ export class AuthService {
     private readonly request: Request,
     @Inject(REDIS_CLIENT) private readonly redisClient: RedisClient,
   ) {
-    this.redisAuthExpire = this.configService.get<number>(
-      'REDIS_EXPIRE_TIME',
-    );
+    this.redisAuthExpire = this.configService.get<number>('REDIS_EXPIRE_TIME');
   }
 
   async login(loginDto: LoginDto): Promise<AccessTokenDto> {
     const user = await this.userService.findUserByEmail(loginDto.email);
 
-    console.log(user)
     const isCorrect = await UtilsService.comparePass(
       loginDto.password,
       user.password,
@@ -60,11 +57,6 @@ export class AuthService {
   }
 
   private generateToken(tokenClaim: TokenClaim): string {
-    // const token = await this.jwtService.signAsync(tokenClaim, {
-    //   secret: this.configService.get<string>('JWT_SECRET'),
-    //   expiresIn: this.configService.get<string>('JWT_EXPIRE_TIME'),
-    // });
-
     const token = this.jwtService.sign(tokenClaim);
 
     return token;
@@ -76,34 +68,31 @@ export class AuthService {
       name: userData.name,
       lastName: userData.lastName,
       email: userData.email,
-      emailVerified: userData.emailVerified
+      emailVerified: userData.emailVerified,
     };
   }
 
-  async sendOtpEmail(email: string): Promise<void> {
-    // Generate a new OTP token
-    const otpToken = this.generateOtpToken();
+  // async sendOtpEmail(email: string): Promise<void> {
+  //   // Generate a new OTP token
+  //   const otpToken = this.generateOtpToken();
 
-    await this.redisClient.set(
-      email,
-      JSON.stringify({
-        code: otpToken,
-        isValid: false,
-      }),
-      'EX',
-      this.redisAuthExpire,
-    );
+  //   await this.redisClient.set(
+  //     email,
+  //     JSON.stringify({
+  //       code: otpToken,
+  //       isValid: false,
+  //     }),
+  //     'EX',
+  //     this.redisAuthExpire,
+  //   );
 
-    // Send the email to the user with the OTP token
-    await this.emailService.sendMail(
-      email,
-      otpToken,
-    );
-  }
+  //   // Send the email to the user with the OTP token
+  //   await this.emailService.sendMail(email, otpToken);
+  // }
 
-  private generateOtpToken(): string {
-    return Math.floor(100000 + Math.random() * 999999).toString();
-  }
+  // private generateOtpToken(): string {
+  //   return Math.floor(1000000 + Math.random() * 9999999).toString();
+  // }
 
   async validateEmail(
     verifyValidationCodeRequest: VerifyValidationCodeDto,
@@ -120,12 +109,16 @@ export class AuthService {
       // Update the emailVerified field in the database to true
       await this.userService.updateVerifiedEmail(email);
 
+      user.emailVerified = true;
+
+      const { token } = await this.generateTokens(user);
       // Delete the OTP token from Redis
       await this.redisClient.del(email);
 
       // Return true to indicate success
       return {
         message: 'email is validated',
+        token: token,
       };
     } else {
       // Return false to indicate failure

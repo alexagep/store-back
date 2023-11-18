@@ -12,7 +12,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('signup')
-  async create(@Body(HashPasswordPipe) userInfo: CreateUserDto): Promise<Users> {
+  async create(
+    @Body(HashPasswordPipe) userInfo: CreateUserDto,
+  ): Promise<Users> {
     const result = await this.usersService.create(userInfo);
     return result;
   }

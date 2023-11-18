@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Products } from './products.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,8 +7,7 @@ import {
   PaginationDto,
   ProductsResponse,
 } from './DTO/product.dto';
-// import { REQUEST } from '@nestjs/core';
-// import { Request } from 'express';
+import { Users } from 'src/users/users.entity';
 
 @Injectable()
 export class ProductsService {
@@ -17,15 +16,14 @@ export class ProductsService {
     private readonly productRepository: Repository<Products>,
   ) {}
 
-  async create(productInfo: CreateProductDto, userId: string): Promise<Products> {
+  async create(productInfo: CreateProductDto, user: Users): Promise<Products> {
     try {
-      productInfo.userId = userId;
+      productInfo.userId = user.id;
       const createdUser = await this.productRepository.create(productInfo);
 
       return this.productRepository.save(createdUser);
-    }
-    catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -35,7 +33,7 @@ export class ProductsService {
     const [rows] = await this.productRepository.findAndCount({
       skip: (paginationDto.page - 1) * (paginationDto.count + 1),
       take: paginationDto.count,
-      order: { createdAt: paginationDto.order }, // order can be 'ASC' or 'DESC'
+      order: { createdAt: paginationDto.order },
     });
     return {
       rows,
@@ -45,9 +43,8 @@ export class ProductsService {
 
   async getUsersProducts(
     paginationDto: PaginationDto,
-    userId: string
+    userId: string,
   ): Promise<ProductsResponse> {
-    console.log(paginationDto)
     const [rows] = await this.productRepository.findAndCount({
       where: { userId: userId },
       skip: (paginationDto.page - 1) * (paginationDto.count + 1),

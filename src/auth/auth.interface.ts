@@ -12,4 +12,5 @@ export interface TokenClaim {
 
 export interface VerifyValidationCodeResponse {
   message: string;
+  token?: string;
 }

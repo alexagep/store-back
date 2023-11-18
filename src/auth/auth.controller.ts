@@ -19,7 +19,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async verify(
     @Body() verifyValidationCodeRequest: VerifyValidationCodeDto,
-    @GetUser() user: Users
+    @GetUser() user: Users,
   ): Promise<VerifyValidationCodeResponse> {
     return this.authService.validateEmail(verifyValidationCodeRequest, user);
   }
