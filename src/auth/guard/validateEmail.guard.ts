@@ -9,6 +9,6 @@ export class EmailVerificationGuard implements CanActivate {
     if (!user.emailVerified) {
       return false;
     }
-    return true
+    return true;
   }
 }
