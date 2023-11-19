@@ -6,6 +6,7 @@ import { HashPasswordPipe } from 'src/auth/mapper/auth.transform.pipe';
 import { GetUser } from 'src/helper/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { VerifyValidationCodeResponse } from 'src/auth/auth.interface';
+import { CreateUserResponse } from './users.interface';
 
 @Controller('users')
 export class UsersController {
@@ -14,7 +15,7 @@ export class UsersController {
   @Post('signup')
   async create(
     @Body(HashPasswordPipe) userInfo: CreateUserDto,
-  ): Promise<Users> {
+  ): Promise<CreateUserResponse> {
     const result = await this.usersService.create(userInfo);
     return result;
   }

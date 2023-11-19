@@ -7,6 +7,7 @@ import { EmailService } from 'src/email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { REDIS_CLIENT, RedisClient } from 'src/common/redis/redis.types';
 import { VerifyValidationCodeResponse } from 'src/auth/auth.interface';
+import { CreateUserResponse } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -22,16 +23,19 @@ export class UsersService {
     this.redisAuthExpire = this.configService.get<number>('REDIS_EXPIRE_TIME');
   }
 
-  async create(userInfo: CreateUserDto): Promise<Users> {
+  async create(userInfo: CreateUserDto): Promise<CreateUserResponse> {
     const createdUser = await this.userRepository.create(userInfo);
 
     const user = await this.userRepository.save(createdUser);
 
-    this.sendOtpEmail(user.email);
+    this.sendOtpEmail(user.email, user.name);
 
     delete user.password;
 
-    return user;
+    return {
+      userInfo: user,
+      message: 'otpCode is sent to your Email, check it out',
+    };
   }
 
   async resendCode(user: Users): Promise<VerifyValidationCodeResponse> {
@@ -39,7 +43,7 @@ export class UsersService {
       throw new BadRequestException('you already are verified');
     }
 
-    this.sendOtpEmail(user.email);
+    this.sendOtpEmail(user.email, user.name);
 
     return {
       message: 'otpCode is sent, check it out',
@@ -58,7 +62,7 @@ export class UsersService {
     await this.userRepository.update({ email }, { emailVerified: true });
   }
 
-  async sendOtpEmail(email: string): Promise<void> {
+  async sendOtpEmail(email: string, name: string): Promise<void> {
     const otpToken = this.generateOtpToken();
 
     await this.redisClient.set(
@@ -71,10 +75,11 @@ export class UsersService {
       this.redisAuthExpire,
     );
 
-    await this.emailService.saveMockFile(email, otpToken);
+    // await this.emailService.saveMockFile(email, otpToken);
+    await this.emailService.sendMail(email, otpToken, name);
   }
 
   private generateOtpToken(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return Math.floor(1000000 + Math.random() * 9999999).toString();
   }
 }

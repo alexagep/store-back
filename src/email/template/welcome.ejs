@@ -1,98 +1,120 @@
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link href="https://fonts.cdnfonts.com/css/iranyekan" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link href="https://fonts.cdnfonts.com/css/iranyekan" rel="stylesheet" />
     <title>Email Template</title>
-    <style>@import url(https://fonts.cdnfonts.com/css/iranyekan);
+    <style>
+      @import url(https://fonts.cdnfonts.com/css/iranyekan);
 
-        * {
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0
-        }
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
 
-        body {
-            direction: rtl;
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: IRANYekan, sans-serif;
-            background-color: #f7f7f7
-        }
+      body {
+        direction: rtl;
+        max-width: 800px;
+        margin: 0 auto;
+        font-family: IRANYekan, sans-serif;
+        background-color: #f7f7f7;
+      }
 
-        html {
-            font-family: IRANYekan
-        }
+      html {
+        font-family: IRANYekan;
+      }
 
-        header {
-            margin-top: 20px
-        }
+      header {
+        margin-top: 20px;
+      }
 
-        header h1 {
-            color: #313131;
-            margin: 50px 0;
-            font-size: 48px
-        }
+      header h1 {
+        color: #313131;
+        margin: 50px 0;
+        font-size: 48px;
+      }
 
-        header h1 span {
-            color: #12a46f
-        }
+      header h1 span {
+        color: #12a46f;
+      }
 
-        main p {
-            line-height: 35px;
-            color: #51515c;
-            font-family: IRANYekan
-        }
+      main p {
+        line-height: 35px;
+        color: #51515c;
+        font-family: IRANYekan;
+      }
 
-        main .btn-container {
-            margin-top: 50px
-        }
+      main .btn-container {
+        margin-top: 50px;
+      }
 
-        main a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            background-color: #12a46f;
-            color: #fff;
-            width: 150px;
-            height: 40px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: .5s;
-            font-size: 18px;
-            font-family: IRANYekan
-        }
+      main a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background-color: #12a46f;
+        color: #fff;
+        width: 150px;
+        height: 40px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: 0.5s;
+        font-size: 18px;
+        font-family: IRANYekan;
+      }
 
-        main a:hover {
-            opacity: .8
-        }
+      main a:hover {
+        opacity: 0.8;
+      }
 
-        .info-container h2 {
-            font-family: IRANYekan;
-            color: #2d3134;
-            font-weight: 700;
-            margin-bottom: 20px
-        }
+      .info-container h2 {
+        font-family: IRANYekan;
+        color: #2d3134;
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
 
-        .info-container h4 {
-            color: #2d3134;
-            margin-bottom: 20px;
-            font-weight: 700;
-            font-family: IRANYekan
-        }</style>
-</head>
-<body dir="rtl">
-<header><h1><span>فروشگاه</span></h1></header>
-<main>
-    <div class="info-container"><h2>باسلام و احترام</h2></div>
-    <div class="info-container"><h4>کاربر محترم روز بخیر</h4></div>
-    <div><p>جهت تکمیل ثبت نام خود با استفاده از کد زیر ایمیل خود را تایید نمایید</p>
-    <div><p>با تشکر</p>
-        <p>تیم پشتیبانی</p></div>
-    <div class="btn-container">ورود به پنل</a></div>
-</main>
-</body>
+      .info-container h4 {
+        color: #2d3134;
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-family: IRANYekan;
+      }
+    </style>
+  </head>
+  <body dir="rtl">
+    <header>
+      <h1><span>فروشگاه علی</span></h1>
+    </header>
+    <main>
+      <div class="info-container"><h2>درود <%= name %> عزیز</h2></div>
+      <div class="info-container"><h4>کاربر محترم روز بخیر</h4></div>
+      <div>
+        <p>
+          جهت تکمیل ثبت نام خود با استفاده از کد زیر ایمیل خود را تایید نمایید
+        </p>
+      </div>
+      <div>
+        <p>Your OTP token is
+            <strong><%= otpToken %></strong>
+        </p>
+        <br />
+        <p>تا ۵ دقیقه دیگر منقضی خواهد شد</p>
+        <br/>
+        <h5>
+          اگر این توکن را شما درخواست نکردید، لطفاً این ایمیل را نادیده بگیرید
+          یا با ما تماس بگیرید <%= email %>
+        </h5>
+      </div>
+
+      <div>
+        <p>با تشکر</p>
+        <p>تیم پشتیبانی</p>
+      </div>
+    </main>
+  </body>
 </html>

@@ -8,14 +8,16 @@ import { writeFileSync } from 'fs';
 export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendMail(email: string, otpToken: string) {
+  async sendMail(email: string, otpToken: string, name: string) {
     await this.mailerService.sendMail({
       to: email,
       subject: "Sending OTP token to user's Email",
-      template: './welcome',
-      text: `Your OTP token is ${otpToken}. It will expire in 5 minutes.`,
+      template: './welcome2',
+      text: `Your OTP token: ${otpToken}. تا ۵ دقیقه دیگر منقضی خواهد شد.`,
       context: {
         otpToken: otpToken,
+        email: process.env.EMAIL_USER,
+        name: name,
       },
     });
   }

@@ -13,15 +13,16 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
       useFactory: async (config: ConfigService) => ({
         transport: {
           host: config.get('MAIL_SERVER_HOST'),
-          // port: config.get('MAIL_SERVER_PORT'),
-          // secure: config.get('EMAIL_SECURE'),
+          port: config.get('MAIL_SERVER_PORT'),
+          secure: false, // true for 465, false for other ports
+          ignoreTLS: false,
           auth: {
             user: config.get('EMAIL_USER'),
             pass: config.get('EMAIL_PASS'),
           },
         },
         defaults: {
-          from: `"Nice App" <${config.get('EMAIL_USER')}>`,
+          from: `"ALI's STORE App" <${config.get('EMAIL_USER')}>`,
         },
         template: {
           dir: join(__dirname, 'template'),
